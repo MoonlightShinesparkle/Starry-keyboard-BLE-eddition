@@ -667,6 +667,3 @@ FodyWeavers.xsd
 *.vscode
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,python
-
-# Lib dir
-/lib/*
