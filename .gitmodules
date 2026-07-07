@@ -1,0 +1,3 @@
+[submodule "Lib/KeyboardBLE"]
+	path = Lib/KeyboardBLE
+	url = https://git.kkozai.com/kenji/pico_ble_hid.git
