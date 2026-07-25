@@ -39,6 +39,8 @@ elseif (NOT EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
 endif()
 
 add_executable(${PROJECT_NAME}
+    Src/Keys/Keys.cpp
+    Src/Util/Data.cpp
 	Src/Main.cpp
 )
 
@@ -59,7 +61,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    WANT_HCI_DUMP=1
+    #WANT_HCI_DUMP=1
 )
 
 pico_enable_stdio_usb(${PROJECT_NAME} 1)

@@ -556,3 +556,8 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio
 
 build/
+/All.sh
+/Build.sh
+/Load.sh
+/Reboot.sh
+/ReCMake.sh

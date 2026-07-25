@@ -1,8 +1,15 @@
+#ifndef StarryBstack
+#define StarryBstack
+
 // BTstack features that can be enabled
 #define ENABLE_LOG_INFO
 #define ENABLE_LOG_ERROR
 #define ENABLE_PRINTF_HEXDUMP
 #define ENABLE_SCO_OVER_HCI
+
+#ifndef ENABLE_BLE
+#define ENABLE_BLE
+#endif
 
 #ifdef ENABLE_BLE
 #define ENABLE_GATT_CLIENT_PAIRING
@@ -83,3 +90,5 @@
 
 // To get the audio demos working even with HCI dump at 115200, this truncates long ACL packets
 //#define HCI_DUMP_STDOUT_MAX_SIZE_ACL 100
+
+#endif

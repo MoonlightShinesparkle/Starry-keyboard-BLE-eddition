@@ -1,21 +1,12 @@
 #include "Main.hpp"
 
-// Raw unique identifier
-unsigned char RawUUID[] = {
-	0x3A,0x0B,0x10,0x1F,0x49,0xA4,0x42,0x0F,0x9A,0x0B,0x95,0xA8,0xC8,0x86,0x51,0x1A
-};
-
-static btstack_packet_callback_registration_t HCIEventRegist;
-static btstack_packet_callback_registration_t L2CAPEventRegist;
-static btstack_packet_callback_registration_t SMEventRegist;
-
-static unsigned char BatteryLvl = 100;
-
-void MainSetup(){
+static void MainSetup(){
 	// CYW43 driver architecture
 	if (cyw43_arch_init()){
-		COut("CYW43_arch failed to initialize");
+		COut("[MainSetup]: CYW43_arch failed to initialize");
 	}
+
+	printf("[ProfileSize]: %u\n", (unsigned)sizeof(profile_data));
 
 	// l2cap
 	l2cap_init();
@@ -31,6 +22,22 @@ void MainSetup(){
 
 	// Batt service
 	battery_service_server_init(BatteryLvl);
+
+	// Device info
+	device_information_service_server_init();
+	device_information_service_server_set_manufacturer_name(ManufacturerName);
+	device_information_service_server_set_model_number(ModelNumber);
+	device_information_service_server_set_hardware_revision(HardwareRevision);
+	device_information_service_server_set_firmware_revision(FirmwareRevision);
+	device_information_service_server_set_software_revision(SoftwareRevision);
+
+	// Get pico serial number
+	pico_get_unique_board_id_string(BoardID, BoardIDSize);
+	
+	std::cout << "[BoardID]: " << BoardID << std::endl;
+
+	// Toss serial number as device serial number
+	device_information_service_server_set_serial_number(BoardID);
 
 	// HID service
 	hids_device_init(0,HIDDescriptorKbdBootMode, sizeof(HIDDescriptorKbdBootMode));
@@ -57,14 +64,273 @@ void MainSetup(){
 	SMEventRegist.callback = &PawketHandler;
 	sm_add_event_handler(&SMEventRegist);
 
-	COut("Main setup finished!");
+	hids_device_register_packet_handler(&PawketHandler);
+
+	COut("[MainSetup]: Main setup finished!");
 }
 
 static void PawketHandler(unsigned char PawketType, unsigned short Channel, unsigned char* Pawket, unsigned short Size){
+	UNUSED(Channel);
+	UNUSED(Size);
 
+	bd_addr_t LocalAddr;
+
+	if (PawketType != HCI_EVENT_PACKET) return;
+
+	switch(hci_event_packet_get_type(Pawket)) {
+		case HCI_EVENT_DISCONNECTION_COMPLETE: {
+			HCICon = HCI_CON_HANDLE_INVALID;
+			Protocol = 0;
+			COut("[Pawket]: Disconnect");
+
+			btstack_run_loop_remove_timer(&MainTimer);
+
+			printf(" - Reason: 0x%02x\n",hci_event_disconnection_complete_get_reason(Pawket));
+
+			gap_advertisements_enable(1);
+			break;
+		} case BTSTACK_EVENT_STATE: {
+			if (btstack_event_state_get_state(Pawket) != HCI_STATE_WORKING) return;
+			gap_local_bd_addr(LocalAddr);
+			printf("[Pawket]: BT stack running within %s\n", bd_addr_to_str(LocalAddr));
+			break;
+		} case HCI_EVENT_META_GAP: {
+			if (hci_event_gap_meta_get_subevent_code(Pawket) == GAP_SUBEVENT_LE_CONNECTION_COMPLETE){
+				HCICon = gap_subevent_le_connection_complete_get_connection_handle(Pawket);
+				printf("[Pawket]: Connection complete with handle 0x%04x\n", HCICon);
+				// Line for some reason creates a disconnect...
+				// sm_request_pairing(HCICon);
+			}
+			break;
+		} case SM_EVENT_JUST_WORKS_REQUEST: {
+			COut("[Pawket]: Just works requested");
+			sm_just_works_confirm(sm_event_just_works_request_get_handle(Pawket));
+			break;
+		} case SM_EVENT_NUMERIC_COMPARISON_REQUEST: {
+			COut("[Pawket]: Confirming numeric comparison");
+			sm_numeric_comparison_confirm(sm_event_numeric_comparison_request_get_handle(Pawket));
+			break;
+		} case SM_EVENT_PASSKEY_DISPLAY_NUMBER: {
+			printf("[Passkey]: %d", sm_event_passkey_display_number_get_passkey(Pawket));
+			break;
+		} case SM_EVENT_IDENTITY_CREATED: {
+			sm_event_identity_created_get_address(Pawket, BTAddr);
+			COut("[Pairing]: Identity created!");
+			printf(" - Type: %u\n", sm_event_identity_created_get_addr_type(Pawket));
+			printf(" - Addr: %s\n", bd_addr_to_str(BTAddr));
+			break;
+		} case SM_EVENT_IDENTITY_RESOLVING_STARTED: {
+			COut("[Pairing]: Pairing began");
+			break;
+		} case SM_EVENT_IDENTITY_RESOLVING_SUCCEEDED: {
+			sm_event_identity_resolving_succeeded_get_address(Pawket, BTAddr);
+			COut("[Pairing]: identity resolved!");
+			printf(" - Type: %u\n", sm_event_identity_resolving_succeeded_get_addr_type(Pawket));
+			printf(" - Addr: %s\n", bd_addr_to_str(BTAddr));
+			break;
+		} case SM_EVENT_IDENTITY_RESOLVING_FAILED: {
+			sm_event_identity_resolving_failed_get_address(Pawket, BTAddr);
+			COut("[Pairing]: identity failed =~=\"");
+			printf(" - Type: %u\n", sm_event_identity_resolving_failed_get_addr_type(Pawket));
+			printf(" - Addr: %s\n", bd_addr_to_str(BTAddr));
+			break;
+		} case SM_EVENT_PAIRING_STARTED: {
+			COut("[Pairing]: Pairing began");
+			break;
+		} case SM_EVENT_PAIRING_COMPLETE: {
+			switch (sm_event_pairing_complete_get_status(Pawket)){
+				case ERROR_CODE_SUCCESS: {
+					COut("[Pairing]: Success :3c");
+					break;
+				} case ERROR_CODE_CONNECTION_TIMEOUT: {
+					COut("[Pairing]: Timeout -~-\"");
+					break;
+				} case ERROR_CODE_REMOTE_USER_TERMINATED_CONNECTION: {
+					COut("[Pairing]: Fluff terminated the connection . _.");
+					break;
+				} case ERROR_CODE_AUTHENTICATION_FAILURE: {
+					printf("[Pairing]: Failure\n - %u\n",sm_event_pairing_complete_get_reason(Pawket));
+					break;
+				} default: {
+					printf("[Pairing]: Completed with unexpected status \"%d\"", sm_event_pairing_complete_get_status(Pawket));
+					break;
+				}
+			}
+			break;
+		} case SM_EVENT_REENCRYPTION_STARTED: {
+			sm_event_reencryption_started_get_address(Pawket, BTAddr);
+			COut("[Reencryption]: Reencryption started");
+			printf(" - Type: %u\n", sm_event_reencryption_started_get_addr_type(Pawket));
+			printf(" - Addr: %s\n", bd_addr_to_str(BTAddr));
+			break;
+		} case SM_EVENT_REENCRYPTION_COMPLETE: {
+			switch (sm_event_reencryption_complete_get_status(Pawket)) {
+				case ERROR_CODE_SUCCESS: {
+					COut("[Reencryption]: Success");
+					break;
+				} case ERROR_CODE_CONNECTION_TIMEOUT: {
+					COut("[Reencryption]: Timeout");
+					break;
+				} case ERROR_CODE_REMOTE_USER_TERMINATED_CONNECTION: {
+					COut("[Reencryption]: Fluff terminated connection");
+					break;
+				} case ERROR_CODE_PIN_OR_KEY_MISSING: {
+					COut("[Reencryption]: Failure, information missing");
+					COut(" - Assuming lost bond information");
+					COut(" - Deleting bond information to allow new pairing");
+					sm_event_reencryption_complete_get_address(Pawket, BTAddr);
+					gap_delete_bonding((bd_addr_type_t) sm_event_reencryption_complete_get_addr_type(Pawket), BTAddr);
+					break;
+				} default: {
+					break;
+				}
+			}
+			break;
+		} case HCI_EVENT_HIDS_META: {
+			switch (hci_event_hids_meta_get_subevent_code(Pawket)){
+				case HIDS_SUBEVENT_INPUT_REPORT_ENABLE: {
+					HCICon = hids_subevent_input_report_enable_get_con_handle(Pawket);
+					std::cout << "[Pawket]: Report subscribed (" << 
+						(hids_subevent_input_report_enable_get_enable(Pawket)? "enabled" : "disabled") << ")" << std::endl;
+					KeyAcquisLoop();
+					break;
+				} case HIDS_SUBEVENT_BOOT_KEYBOARD_INPUT_REPORT_ENABLE: {
+					HCICon = hids_subevent_boot_keyboard_input_report_enable_get_con_handle(Pawket);
+					std::cout << "[Pawket]: Boot report subscribed (" <<
+						(hids_subevent_boot_keyboard_input_report_enable_get_enable(Pawket)) << ")" << std::endl;
+					break;
+				} case HIDS_SUBEVENT_PROTOCOL_MODE: {
+					Protocol = hids_subevent_protocol_mode_get_protocol_mode(Pawket);
+					std::cout << "[Pawket]: Protocol mode switched into " << (Protocol? "report" : "boot") << std::endl;
+					break;
+				} case HIDS_SUBEVENT_CAN_SEND_NOW: {
+					SendData();
+					break;
+				} default: {
+					break;
+				}
+			}
+			break;
+		} default: {
+			break;
+		}
+	}
 }
 
-int main(void){
-	COut("Initializing starry keyboard");
+static unsigned char ModifierBit(unsigned char Keycode){
+	return Keycode >= 0xE0 && Keycode <= 0xE8 
+		? 1 << (Keycode - 0xE0)
+		: 0;
+}
+
+static void SendData(){
+	// A report consisting of the current modifiers
+	unsigned char Report[] = {Modifiers, 0, 0,0,0,0,0,0};
+
+	// Load keycodes into report
+	unsigned char Modifier = 0;
+	unsigned char X = 1;
+	for (unsigned char Keycode : CachedKeycodes){
+		X++;
+		Modifier += ModifierBit(Keycode);
+		Report[X] = Keycode;
+	}
+
+	if (CalculateModifier){
+		Report[0] = Modifier;
+	} else {
+		CalculateModifier = true;
+	}
+
+	// Choose an appropriate protocol based on the given Protocol var
+	switch(Protocol){
+		case 0: {
+			hids_device_send_boot_keyboard_input_report(HCICon, Report, sizeof(Report));
+			break;
+		} case 1: {
+			hids_device_send_input_report(HCICon, Report, sizeof(Report));
+			break;
+		} default: {
+			break;
+		}
+	}
+}
+
+static void SendKey(unsigned char Modif, unsigned char Chr){
+	Modifiers = Modif;
+	CalculateModifier = false;
+	CachedKeycodes[0] = Chr;
+	for(unsigned char X = 1; X < 6; X++){
+		CachedKeycodes[X] = 0;
+	}
+	hids_device_request_can_send_now_event(HCICon);
+}
+
+static void LoadScan(btstack_timer_source_t* TimerSource){
+	bool Changed = false;
+	Scan(&Changed);
+
+	if (Changed){
+		uchar X = 0;
+		for (Key K : KeysJustPressed){
+			if (X >= 6) break;
+			if (K.IsNull()) continue;
+			CachedKeycodes[X] = (uchar) K;
+			X++;
+		}
+		for (Key K : KeysPressing){
+			if (X >= 6) break;
+			if (K.IsNull()) continue;
+			CachedKeycodes[X] = (uchar) K;
+			X++;
+		}
+		for(;X < 6; X++){
+			CachedKeycodes[X] = 0;
+		}
+
+		printf("[Chrlist]: ");
+		for (uchar Chr : CachedKeycodes){
+			printf("0x%02X ",Chr);
+		}
+		printf("\n");
+
+		hids_device_request_can_send_now_event(HCICon);
+	}
+
+	if (HCICon == HCI_CON_HANDLE_INVALID) return;
+
+	btstack_run_loop_set_timer(TimerSource, Delay);
+	btstack_run_loop_add_timer(TimerSource);
+}
+
+static void KeyAcquisLoop(){
+	COut("[Main]: Began key acquisition loop");
+
+	MainTimer.process = &LoadScan;
+	btstack_run_loop_set_timer(&MainTimer, Delay);
+	btstack_run_loop_add_timer(&MainTimer);
+}
+
+int btstack_main(int argc, const char * argv[]){
+	UNUSED(argc);
+	UNUSED(argv);
+
+	COut("[Main]: Initializing starry keyboard");
+	MainSetup();
+
+	hci_power_control(HCI_POWER_ON);
 	return 0;
 };
+
+int main(){
+	stdio_init_all();
+	sleep_ms(10000);
+
+	SetupKeys();
+
+	btstack_main(0, nullptr);
+
+	for(;;){
+		tight_loop_contents();
+	}
+}
