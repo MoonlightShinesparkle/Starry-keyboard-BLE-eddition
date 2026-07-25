@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.23)
 
-set(PICO_BOARD pico_w)
+set(PICO_BOARD pico2_w)
 
 # Since visual studio code won't detect zsh exported variables...
 if (NOT DEFINED ENV{PICO_SDK_PATH})
