@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
     pico_cyw43_arch_none
 	pico_unique_id
 	hardware_i2c
+    hardware_adc
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

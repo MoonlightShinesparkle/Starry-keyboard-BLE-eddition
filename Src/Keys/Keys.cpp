@@ -5,6 +5,15 @@
 #define PICO_DEFAULT_LED_PIN 25
 #endif
 
+/* 
+
+Keys module
+Contains different functions for managing the keyboard itself in a physical level, storing data in the form of keys
+
+*/
+
+// SECTION Key IO & setup functions
+
 //╔═══════════════════════════ Start of Key IO & setup functions ═══════════════════════════╗
 
 	void SetKeyboardInput(uchar GPIO){
@@ -24,6 +33,9 @@
 
 //╚════════════════════════════ End of Key IO & setup functions ════════════════════════════╝
 
+// !SECTION Key IO & setup functions
+
+// SECTION Key array functions
 
 //╔══════════════════════════════ Start of Key array functions ═════════════════════════════╗
 
@@ -141,3 +153,5 @@
 	}
 	
 //╚═══════════════════════════════ End of Key array functions ══════════════════════════════╝
+
+// !SECTION Key array functions

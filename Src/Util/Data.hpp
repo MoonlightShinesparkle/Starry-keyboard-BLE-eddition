@@ -1,5 +1,12 @@
 #pragma once
 
+/* 
+
+Data module
+Contains certain useful functions for GPIO manipulation and a compact vector2 class for storing positions in a single byte
+
+*/
+
 #include "pico/stdlib.h"
 #include <stdio.h>
 #include <string>
@@ -22,6 +29,9 @@
 	 * @param PullDown Use pull down resistor
      */
     void SetAsInput(uint GPIO, bool PullDown);
+
+    // Multiplier for ADC values, turns ADC into voltage
+    #define ADCConversionFactor 3.3f / (1 << 12);
 
 //╚══════════════════════════ End of GPIO definitions ══════════════════════════╝
 

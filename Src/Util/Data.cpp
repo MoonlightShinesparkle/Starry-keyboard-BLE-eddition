@@ -38,6 +38,7 @@
 //╚══════════════════════ End of CompactVec2 functions ═════════════════════╝
 
 // !SECTION - CompactVec2
+
 // SECTION - GPIO
 
 //╔════════════════════════ Start of GPIO functions ════════════════════════╗

@@ -7,6 +7,8 @@
 #include <Src/Util/Events/Event.hpp>
 #include <Src/Config/Physical.hpp>
 
+// SECTION Key class
+
 //╔════════════════════════════════════ Start of key class ════════════════════════════════════╗
 
 	/// @brief Information container for keys
@@ -89,16 +91,18 @@
 
 //╚═════════════════════════════════════ End of key class ═════════════════════════════════════╝
 
+// !SECTION Key class
+
+// SECTION Keyboard
+
 //╔═════════════════════════════════════ Start of keyboard ════════════════════════════════════╗
 
 	/// Key char used to force bootsel onto the device, should not be sent as it's reserved
 	const uchar KeyUpgrade = 0xE8;
 
-//║ *- Keyboard layout																 		   ║
-//║ *- 4 layouts are possible based on if shift/keyboard are active					 		   ║
-
 	/**
-	 * @brief A bidimensional array which holds the available layouts, composed of the many keys loaded into the keyboard
+	 * @brief A bidimensional array which holds the available layouts, 
+	 * composed of the many keys loaded into the keyboard
 	 * @note The default layout is as follows:
 	 * @note M O N L I
 	 * @note G H T W A
@@ -130,6 +134,7 @@
 	void SetKeyboardInput(uchar GPIO);
 
 //║ *- Inpin & Outpin are keyboard based													   ║
+//║ *- Based on the Moonlit calc project													   ║
 //║	   KBD							 Pico													   ║
 //║	 ╔═════╗						╔════╗													   ║
 //║	 ╠═════╣			Inpin		║	 ║													   ║
@@ -201,3 +206,5 @@
 	void ForceBootsel();
 
 //╚══════════════════════════════════════ End of keyboard ═════════════════════════════════════╝
+
+// !SECTION Keyboard
