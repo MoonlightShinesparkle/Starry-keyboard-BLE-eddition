@@ -48,6 +48,9 @@ A file which allows the simple modification of general physical properties
 	// Maximum battery voltage, 4.2 for a regular LiPo cell
 	#define BattMaxVoltage 4.2
 
+	// Minimum battery voltage, 3.2 for a regular setup
+	#define BattMinVoltage 3.2
+
 //╚════════════════════════════════ End of Battery configuration ═══════════════════════════════╝
 
 // !SECTION Battery configurations

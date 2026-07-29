@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <math.h>
 #include "Descriptors/HIDData.hpp"
 #include "Config/Physical.hpp"
 #include "Keys/Keys.hpp"
@@ -91,6 +92,9 @@ extern "C"{
 
 //╔══════════════════════════════════════════════ Start of Battery management ═════════════════════════════════════════════╗
 
+	// True battery maximum considering min voltage
+	#define BattTrueMaximum BattMaxVoltage - BattMinVoltage
+
 	// Represents the current battery level of the device
 	static inline unsigned char BatteryLvl = 100;
 
@@ -103,6 +107,9 @@ extern "C"{
 	/// @brief Initializes the battery ADC vars required for voltage acquisition
 	/// @note Fills in battery voltage array
 	static void BattADCInnit();
+
+	/// @brief Fills next spot in BattReadings, updating old values
+	static void DoNextReading();
 	
 	/// @brief Obtains the battery voltage from ADC0
 	/// @note Voltage is halved due to resistor divider, a pico can't handle a batt's raw voltage

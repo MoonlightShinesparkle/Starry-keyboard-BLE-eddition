@@ -281,7 +281,68 @@
 
 //╔══════════════════════════════════════════════ Start of Battery management ═════════════════════════════════════════════╗
 
-// TODO this whole thing TwT"
+	static void BattADCInnit(){
+		COut("[ADC]: Initializing batt ADC");
+		// Init GPIO 0 pin
+		gpio_init(26);
+
+		// Select ADC 0
+		adc_select_input(0);
+		for(; BattReadingIndex < BattSamples; BattReadingIndex++){
+			BattReadings[BattReadingIndex] = AcquireBattVoltage();
+			COut("[Batt]: Acquired reading of " << BattReadings[BattReadingIndex]);
+		}
+
+		// Load in batt percent as first reading
+		AcquireBattPercent();
+	}
+
+	static void DoNextReading(){
+		// Select ADC 0
+		adc_select_input(0);
+		BattReadingIndex++;
+
+		// Move index one spot, returning to 0 if overflowing
+		if (BattReadingIndex >= BattSamples){
+			BattReadingIndex = 0;
+		}
+
+		// Fill in spot with a reading
+		BattReadings[BattReadingIndex] = AcquireBattVoltage();
+		printf("[Batt]: Levels at %fV\n",BattReadings[BattReadingIndex]);
+	}
+	
+	static double AcquireBattVoltage(){
+		// Simple ADC read
+		return adc_read() * ADCConversionFactor;
+	}
+	
+	static void AcquireBattPercent(){
+		double BattAverage = 0;
+
+		// Sum all voltages
+		for(double Voltage : BattReadings){
+			BattAverage += Voltage;
+		}
+
+		// Divide by the quantity of samples
+		BattAverage /= BattSamples;
+		// Revert voltage divider division
+		BattAverage *= 2;
+
+		printf("[Batt]: Average (2x) at %fV\n", BattAverage);
+		
+		// Obtain raw percent in double, clamp between 0 and 100, turn into unsigned char
+		unsigned char Percent = ((unsigned char) std::clamp<double>(
+			std::ceil(
+				((BattAverage-BattMinVoltage)/(BattTrueMaximum))*100
+			)
+			,0,
+			100
+		));
+		BatteryLvl = Percent;
+		printf("[Batt]: Set level to %d\n",BatteryLvl);
+	}
 
 //╚═══════════════════════════════════════════════ End of Battery management ══════════════════════════════════════════════╝
 
@@ -312,6 +373,13 @@
 	}
 
 	static void LoadScan(btstack_timer_source_t* TimerSource){
+		// Update batt percent status
+		DoNextReading();
+		AcquireBattPercent();
+
+		// Update value
+		battery_service_server_set_battery_value(BatteryLvl);
+
 		// Checks if the pressed keycode list was changed at all
 		bool Changed = false;
 		// Checks through all keys for changes
@@ -374,6 +442,9 @@
 	int main(){
 		stdio_init_all();
 		sleep_ms(10000);
+		adc_init();
+
+		BattADCInnit();
 
 		SetupKeys();
 
