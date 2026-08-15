@@ -106,6 +106,9 @@
 					printf("[Pawket]: Connection complete with handle 0x%04x\n", HCICon);
 					// Line for some reason creates a disconnect...
 					// sm_request_pairing(HCICon);
+
+					// NOTE Added
+					gatt_client_discover_primary_services(&PawketHandler, HCICon);
 				}
 				break;
 			} case SM_EVENT_JUST_WORKS_REQUEST: {
@@ -373,13 +376,24 @@
 	}
 
 	static void LoadScan(btstack_timer_source_t* TimerSource){
+		/* 
+		//	NOTE: while this function mostly handles key management, this serves as the main cycle that runs every time
+			the keyboard wishes to update, it generally handles keys being pressed/unpressed but can also be used for
+			stuff such as updating the battery percent
+		*/
+
 		// Update batt percent status
 		DoNextReading();
 		AcquireBattPercent();
 
-		// Update value
-		battery_service_server_set_battery_value(BatteryLvl);
+		BattCycle++;
 
+		if (BattCycle >= BattReadingDelayCycles){
+			// Update value
+			battery_service_server_set_battery_value(BatteryLvl);
+			BattCycle = 0;
+		}
+		
 		// Checks if the pressed keycode list was changed at all
 		bool Changed = false;
 		// Checks through all keys for changes
@@ -451,6 +465,11 @@
 		btstack_main(0, nullptr);
 
 		for(;;){
+			//char Meow[] = "";
+			//gets(Meow);
+
+			//COut("[Input]: " << Meow);
+
 			tight_loop_contents();
 		}
 	}

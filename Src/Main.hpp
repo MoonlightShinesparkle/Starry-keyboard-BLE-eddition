@@ -104,6 +104,9 @@ extern "C"{
 	// Current slot for battery reads
 	static inline unsigned char BattReadingIndex = 0;
 
+	// Current cycle of delay for a batt update
+	static inline unsigned char BattCycle = 0;
+
 	/// @brief Initializes the battery ADC vars required for voltage acquisition
 	/// @note Fills in battery voltage array
 	static void BattADCInnit();

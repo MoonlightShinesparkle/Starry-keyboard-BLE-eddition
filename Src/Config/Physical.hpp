@@ -45,6 +45,10 @@ A file which allows the simple modification of general physical properties
 	// reaction to change
 	#define BattSamples 10
 
+	// Amount of delay time between each battery update, note that battery readings will still
+	// remain one per cycle, usually being every 10 ms per cycle
+	#define BattReadingDelayCycles 200
+
 	// Maximum battery voltage, 4.2 for a regular LiPo cell
 	#define BattMaxVoltage 4.2
 
