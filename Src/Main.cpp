@@ -107,7 +107,6 @@
 					// Line for some reason creates a disconnect...
 					// sm_request_pairing(HCICon);
 
-					// NOTE Added
 					gatt_client_discover_primary_services(&PawketHandler, HCICon);
 				}
 				break;
@@ -215,6 +214,54 @@
 					} case HIDS_SUBEVENT_CAN_SEND_NOW: {
 						SendData();
 						break;
+					} case HIDS_SUBEVENT_SET_REPORT:{
+						COut("[LED]: Subevent set report called");
+						// Acquire output data from computer, such as LEDs... can only be LEDs due to GATT .w.
+						switch (hids_subevent_set_report_get_report_type(Pawket)){
+							// Filter out for output reports
+							case HID_REPORT_TYPE_OUTPUT: {
+								COut("[LED]: Subevent report type output");
+								// Check for useability of said report, must be 1 (LED/Padding report) and have a report length
+								if ((hids_subevent_set_report_get_report_id(Pawket) != 1) || (hids_subevent_set_report_get_report_length(Pawket) < 1)){
+									break;
+								}
+
+								COut("[LED]: Subevent report ID 1, size >= 1");
+
+								const unsigned char* Report = hids_subevent_set_report_get_report_data(Pawket);
+
+								unsigned char LEDs = Report[0];
+
+								printf("[LED]: LED report = 0x%02X\n", LEDs);
+
+								bool NumLock = (LEDs & 1) == 1; 
+								bool CapsLock = ((LEDs >> 1) & 1) == 1;
+								bool ScrollLock = ((LEDs >> 2) & 1) == 1;
+								bool Compose = ((LEDs >> 3) & 1) == 1;
+								bool Kana = ((LEDs >> 4) & 1) == 1;
+
+								// Lines configureable through Physical.hpp definitions
+								#ifdef NumLockGPIO
+									gpio_put(NumLockGPIO, NumLock);
+								#endif
+								#ifdef CapsLockGPIO
+									gpio_put(CapsLockGPIO, CapsLock);
+								#endif
+								#ifdef ScrollLockGPIO
+									gpio_put(ScrollLockGPIO, ScrollLock);
+								#endif
+								#ifdef ComposeGPIO
+									gpio_put(ComposeGPIO, Compose);
+								#endif
+								#ifdef KanaGPIO
+									gpio_put(KanaGPIO, Kana);
+								#endif
+
+								break;
+							} default: {
+								break;
+							}
+						}
 					} default: {
 						break;
 					}
@@ -312,7 +359,7 @@
 
 		// Fill in spot with a reading
 		BattReadings[BattReadingIndex] = AcquireBattVoltage();
-		printf("[Batt]: Levels at %fV\n",BattReadings[BattReadingIndex]);
+		//printf("[Batt]: Levels at %fV\n",BattReadings[BattReadingIndex]);
 	}
 	
 	static double AcquireBattVoltage(){
@@ -333,7 +380,7 @@
 		// Revert voltage divider division
 		BattAverage *= 2;
 
-		printf("[Batt]: Average (2x) at %fV\n", BattAverage);
+		//printf("[Batt]: Average (2x) at %fV\n", BattAverage);
 		
 		// Obtain raw percent in double, clamp between 0 and 100, turn into unsigned char
 		unsigned char Percent = ((unsigned char) std::clamp<double>(
@@ -344,7 +391,7 @@
 			100
 		));
 		BatteryLvl = Percent;
-		printf("[Batt]: Set level to %d\n",BatteryLvl);
+		//printf("[Batt]: Set level to %d\n",BatteryLvl);
 	}
 
 //╚═══════════════════════════════════════════════ End of Battery management ══════════════════════════════════════════════╝
@@ -455,12 +502,34 @@
 //╔═════════════════════════════════════════════════ Start of Main function ═══════════════════════════════════════════════╗
 	int main(){
 		stdio_init_all();
+
 		sleep_ms(10000);
 		adc_init();
 
 		BattADCInnit();
 
 		SetupKeys();
+
+		#ifdef NumLockGPIO
+			COut("[Startup] Set Num Lock to GPIO #" << NumLockGPIO);
+			SetAsOutput(NumLockGPIO);
+		#endif
+		#ifdef CapsLockGPIO
+			COut("[Startup] Set Caps Lock to GPIO #" << CapsLockGPIO);
+			SetAsOutput(CapsLockGPIO);
+		#endif
+		#ifdef ScrollLockGPIO
+			COut("[Startup] Set Scroll Lock to GPIO #" << ScrollLockGPIO);
+			SetAsOutput(ScrollLockGPIO);
+		#endif
+		#ifdef ComposeGPIO
+			COut("[Startup] Set Compose to GPIO #" << ComposeGPIO);
+			SetAsOutput(ComposeGPIO);
+		#endif
+		#ifdef KanaGPIO
+			COut("[Startup] Set Kana to GPIO #" << KanaGPIO);
+			SetAsOutput(KanaGPIO);
+		#endif
 
 		btstack_main(0, nullptr);
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Src/Util/Data.hpp>
 #include "hardware/i2c.h"
 
@@ -42,8 +44,10 @@
 			/// @brief Amount of delay to wait for chip to settle in mS
 			static inline unsigned int PinDelay = 5;
 
+			/// @brief Full length of an 24C16 chip
 			static const unsigned int Length = 2048;
 
+			/// @brief Block length of an 24C16 chip
 			static const unsigned int BlockSize = 256;
 
 			/// @brief Creates an 24C16 object with given GPIOs initialized

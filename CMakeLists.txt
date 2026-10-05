@@ -43,6 +43,7 @@ add_executable(${PROJECT_NAME}
     Src/Util/Data.cpp
 	Src/Main.cpp
     Src/Lib/24C16.cpp
+    Src/Keys/Load.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

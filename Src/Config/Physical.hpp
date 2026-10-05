@@ -30,7 +30,7 @@ A file which allows the simple modification of general physical properties
 	#define ManufacturerName "Moonlit"
 	#define ModelNumber "StarryBLE"
 	#define HardwareRevision "1.0.0a"
-	#define FirmwareRevision "0.0.5a"
+	#define FirmwareRevision "0.0.6a"
 	#define SoftwareRevision "N/A"
 
 //╚════════════════════════════ End of BLE information definitions ═════════════════════════════╝
@@ -56,5 +56,31 @@ A file which allows the simple modification of general physical properties
 	#define BattMinVoltage 3.2
 
 //╚════════════════════════════════ End of Battery configuration ═══════════════════════════════╝
+
+// !SECTION Battery configurations
+
+// SECTION LED configurations
+
+//╔═════════════════════════════════ Start of LED configuration ════════════════════════════════╗
+
+	// Comment/Uncomment definitions to toggle useage of LED GPIOs
+	// These must also be equal to the GPIO they control
+
+	// Num lock GPIO 
+	#define NumLockGPIO 13
+
+	// Caps lock GPIO
+	#define CapsLockGPIO 12
+
+	// Scroll lock GPIO
+	#define ScrollLockGPIO 14
+
+	// Compose GPIO
+	//#define ComposeGPIO
+
+	// Kana GPIO
+	//#define KanaGPIO
+
+//╚══════════════════════════════════ End of LED configuration ═════════════════════════════════╝
 
 // !SECTION Battery configurations
