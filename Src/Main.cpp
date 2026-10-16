@@ -446,8 +446,19 @@
 		// Checks through all keys for changes
 		Scan(&Changed);
 
+		// Increase PMOSTimer if present
+		#ifdef PMOSCtrl
+			PMOSTimer++;
+			gpio_put(PMOSCtrl, PMOSTimer >= PMOSTurnOff);
+		#endif
+
 		// Only load in keys if a change was performed
 		if (Changed){
+			// Reset PMOSTimer if present, activity has been seen
+			#ifdef PMOSCtrl
+				PMOSTimer = 0;
+			#endif
+
 			// Master index, used in all loops within the loading procedure
 			uchar X = 0;
 			// Load keys from KeysJustPressed
@@ -510,26 +521,35 @@
 
 		SetupKeys();
 
-		#ifdef NumLockGPIO
-			COut("[Startup] Set Num Lock to GPIO #" << NumLockGPIO);
-			SetAsOutput(NumLockGPIO);
-		#endif
-		#ifdef CapsLockGPIO
-			COut("[Startup] Set Caps Lock to GPIO #" << CapsLockGPIO);
-			SetAsOutput(CapsLockGPIO);
-		#endif
-		#ifdef ScrollLockGPIO
-			COut("[Startup] Set Scroll Lock to GPIO #" << ScrollLockGPIO);
-			SetAsOutput(ScrollLockGPIO);
-		#endif
-		#ifdef ComposeGPIO
-			COut("[Startup] Set Compose to GPIO #" << ComposeGPIO);
-			SetAsOutput(ComposeGPIO);
-		#endif
-		#ifdef KanaGPIO
-			COut("[Startup] Set Kana to GPIO #" << KanaGPIO);
-			SetAsOutput(KanaGPIO);
-		#endif
+		// SECTION GPIO initialization 
+
+			#ifdef NumLockGPIO
+				COut("[Startup] Set Num Lock to GPIO #" << NumLockGPIO);
+				SetAsOutput(NumLockGPIO);
+			#endif
+			#ifdef CapsLockGPIO
+				COut("[Startup] Set Caps Lock to GPIO #" << CapsLockGPIO);
+				SetAsOutput(CapsLockGPIO);
+			#endif
+			#ifdef ScrollLockGPIO
+				COut("[Startup] Set Scroll Lock to GPIO #" << ScrollLockGPIO);
+				SetAsOutput(ScrollLockGPIO);
+			#endif
+			#ifdef ComposeGPIO
+				COut("[Startup] Set Compose to GPIO #" << ComposeGPIO);
+				SetAsOutput(ComposeGPIO);
+			#endif
+			#ifdef KanaGPIO
+				COut("[Startup] Set Kana to GPIO #" << KanaGPIO);
+				SetAsOutput(KanaGPIO);
+			#endif
+
+			#ifdef PMOSCtrl
+				COut("[Startup] Set PMOS control to GPIO #" << PMOSCtrl);
+				SetAsOutput(PMOSCtrl);
+			#endif
+
+		// !SECTION GPIO initialization
 
 		btstack_main(0, nullptr);
 

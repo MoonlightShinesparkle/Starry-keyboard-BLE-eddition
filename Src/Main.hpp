@@ -131,6 +131,10 @@ extern "C"{
 
 //╔════════════════════════════════════════════════ Start of Key management ═══════════════════════════════════════════════╗
 
+	#ifdef PMOSCtrl
+		static inline unsigned char PMOSTimer = 0;
+	#endif
+
 	// Current keyboard modifiers
 	static inline unsigned char Modifiers = 0;
 

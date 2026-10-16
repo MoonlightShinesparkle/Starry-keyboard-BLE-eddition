@@ -148,7 +148,7 @@
 	 * @note Outpins are keyboard orientated; they send signals to the pico
 	 */
 	const uchar KeyboardOutputs[SizeX]{
-		5,6,7,8,9
+		XGPIOs
 	};
 
 	/**
@@ -156,7 +156,7 @@
 	 * @note Inpins are keyboard orientated; they recieve signals from the pico
 	 */
 	const uchar KeyboardInputs[SizeY]{
-		0,1,2,3,4
+		YGPIOs
 	};
 
 	/// @brief Sets input and output pins to drive the keyboard

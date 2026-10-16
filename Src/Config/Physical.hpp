@@ -18,6 +18,12 @@ A file which allows the simple modification of general physical properties
 	// Y dimension of the keyboard in buttons
 	#define SizeY 5
 
+	// Bus GPIOs, AKA Outpins, must be equal to SizeX
+	#define XGPIOs 5,6,7,8,9 
+
+	// In GPIOs, AKA Inpins, must be equal to SizeY
+	#define YGPIOs 0,1,2,3,4
+
 //╚═════════════════════════════════════ End of Dimensions ═════════════════════════════════════╝
 
 // !SECTION Dimensions
@@ -29,8 +35,8 @@ A file which allows the simple modification of general physical properties
 	// Current hardware/software revisions and info
 	#define ManufacturerName "Moonlit"
 	#define ModelNumber "StarryBLE"
-	#define HardwareRevision "1.0.0a"
-	#define FirmwareRevision "0.0.6a"
+	#define HardwareRevision "3.0.0"
+	#define FirmwareRevision "0.1.0a"
 	#define SoftwareRevision "N/A"
 
 //╚════════════════════════════ End of BLE information definitions ═════════════════════════════╝
@@ -81,6 +87,26 @@ A file which allows the simple modification of general physical properties
 	// Kana GPIO
 	//#define KanaGPIO
 
+	// Key underlight toggle
+	#define PMOSCtrl 5
+
+	// NOTE: Timer shouldn't be commented out, it's only used if PMOSCtrl is enabled
+
+	// Key underlight delay
+	#define PMOSTurnOff 1000
 //╚══════════════════════════════════ End of LED configuration ═════════════════════════════════╝
 
 // !SECTION Battery configurations
+
+// SECTION Hardware characteristics
+
+//╔══════════════════════════════ Start of Hardware characteristics ════════════════════════════╗
+
+	// Comment/Uncomment to define board hardware characteristics
+
+	// Presence of a schmitt trigger not gate chip (as 74HC14)
+	#define SchmittInvert
+
+//╚═══════════════════════════════ End of Hardware characteristics ═════════════════════════════╝
+
+// !SECTION Hardware characteristics

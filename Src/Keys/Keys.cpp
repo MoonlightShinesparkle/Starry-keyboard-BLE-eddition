@@ -100,7 +100,13 @@ Contains different functions for managing the keyboard itself in a physical leve
 			
 			for (uchar x : KeyboardOutputs){
 				// Check if column is pressed in the current row
-				bool Pressed = gpio_get(x) == 0;
+				// NOTE: Schmitt trigger inverts acquired data, define behaviour in Physical.hpp
+				#ifdef SchmittInvert
+					bool Pressed = gpio_get(x) == 1;
+				#elifndef
+					bool Pressed = gpio_get(x) == 0;
+				#endif
+
 				int KeyPos = 0;
 				Code.Recreate(CurrXPos, CurrYPos);
 
