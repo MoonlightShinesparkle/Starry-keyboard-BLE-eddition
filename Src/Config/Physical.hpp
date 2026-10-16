@@ -94,6 +94,7 @@ A file which allows the simple modification of general physical properties
 
 	// Key underlight delay
 	#define PMOSTurnOff 1000
+
 //╚══════════════════════════════════ End of LED configuration ═════════════════════════════════╝
 
 // !SECTION Battery configurations
@@ -104,7 +105,7 @@ A file which allows the simple modification of general physical properties
 
 	// Comment/Uncomment to define board hardware characteristics
 
-	// Presence of a schmitt trigger not gate chip (as 74HC14)
+	// Presence of a schmitt trigger NOT gate chip (such as 74HC14)
 	#define SchmittInvert
 
 //╚═══════════════════════════════ End of Hardware characteristics ═════════════════════════════╝

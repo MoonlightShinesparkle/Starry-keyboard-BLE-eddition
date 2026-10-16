@@ -1,13 +1,16 @@
 #pragma once
 
 #include <Src/Lib/24C16.hpp>
+#include <Src/Config/Physical.hpp>
+#include <Src/Keys/Types/KeyTypes.hpp>
+#include <iostream>
 
 // SECTION - MemMisc
 
 //╔═════════════════════════════════════════════════ Start of Mem misc ═══════════════════════════════════════════════╗
 
 	/// @brief Format specific magic number
-	const unsigned char MagicNo[] = {
+	const unsigned char MagicNo[13] = {
 		0x53, 0x74, 0x61, 0x72, // Star
 		0x72, 0x79, 0x4B, 0x62, // ryKb
 		0x64, 0x46, 0x6F, 0x72, // dFor
@@ -27,10 +30,10 @@
 	#define FileEnd 0x04
 
 	/// Default data array size (X)
-	#define DefaultKeysSizeX = 5
+	#define DefaultKeysSizeX 5
 
 	/// Default data array size (Y)
-	#define DefaultKeysSizeY = 5
+	#define DefaultKeysSizeY 5
 
 	/**
 	 * @brief A bidimensional array of default data for a keyboard
@@ -42,7 +45,7 @@
 	 * @note * O . = -
 	 * @note Where * is bootsel
 	 */
-	const unsigned char DefaultKeys[5][5]{
+	const unsigned char DefaultKeys[DefaultKeysSizeY][DefaultKeysSizeX]{
 		// Moonlight was here layout
 		{0x10,0x12,0x11,0x0F,0x0C},
 		{0x0A,0x0B,0x17,0x1A,0x04},
@@ -50,6 +53,9 @@
 		{0x2C,0x28,0xE1,0x39,0x2A},
 		{0xE8,0x27,0x37,0x2E,0x2D}
 	};
+
+	// Default key if out of range of default layout
+	#define DefaultIfOORKey 0x35
 
 //╚═════════════════════════════════════════════════ End of Mem misc ═════════════════════════════════════════════════╝
 
@@ -59,7 +65,20 @@
 
 //╔══════════════════════════════════════════════ Start of Starry parser ═════════════════════════════════════════════╗
 
+	/// @brief Attempts loading data from given EEPROM into destination
+	/// @param Source Source EEPROM with pawsible data
+	/// @param Destination Destination array where keys will be inserted into
+	/// @note Runs VerifyMem and outputs a default layout where applicable
+	static void LoadKeys(Mem24C16 Source, BaseKey Destination[SizeY][SizeX]);
 
+	/// @brief Returns wheter an EEPROM contains useable data or not
+	/// @param Source Source EEPROM with pawsible data
+	/// @return True if MagicNo has been retrieved successfully
+	static bool VerifyMem(Mem24C16 Source);
+
+	/// @brief Loads default data into Destination
+	/// @param Destination Destination array where keys will be inserted into
+	static void LoadDefaults(BaseKey Destination[SizeY][SizeX]);
 
 //╚══════════════════════════════════════════════ End of Starry parser ═══════════════════════════════════════════════╝
 

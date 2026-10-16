@@ -27,7 +27,7 @@
 //╔══════════════════════════════════════════════════ Start of Single key ════════════════════════════════════════════════╗
 
 	/// @brief A simple single char key
-	class SingleKey : BaseKey {
+	class SingleKey : public BaseKey {
 		public:
 			unsigned char USBKey;
 
@@ -49,7 +49,7 @@
 //╔══════════════════════════════════════════════════ Start of Multi key ═════════════════════════════════════════════════╗
 
 	/// @brief A simple single char key
-	class MultiKey : BaseKey {
+	class MultiKey : public BaseKey {
 		public:
 			unsigned char USBKeys[6] = {};
 
@@ -86,7 +86,7 @@
 //╔══════════════════════════════════════════════════ Start of Text key ══════════════════════════════════════════════════╗
 
 	/// @brief A simple single char key
-	class TextKey : BaseKey {
+	class TextKey : public BaseKey {
 		public:
 			std::string Text;
 
