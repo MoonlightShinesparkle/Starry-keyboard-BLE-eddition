@@ -39,11 +39,11 @@ elseif (NOT EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
 endif()
 
 add_executable(${PROJECT_NAME}
+    Src/Lib/24C16.cpp
+    Src/Keys/Load.cpp
     Src/Keys/Keys.cpp
     Src/Util/Data.cpp
 	Src/Main.cpp
-    Src/Lib/24C16.cpp
-    Src/Keys/Load.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

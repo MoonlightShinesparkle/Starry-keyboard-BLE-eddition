@@ -69,7 +69,7 @@
 	/// @param Source Source EEPROM with pawsible data
 	/// @param Destination Destination array where keys will be inserted into
 	/// @note Runs VerifyMem and outputs a default layout where applicable
-	static void LoadKeys(Mem24C16 Source, BaseKey* Destination[SizeY][SizeX]);
+	void LoadKeys(Mem24C16 Source, BaseKey* Destination[SizeY][SizeX]);
 
 	/// @brief Returns wheter an EEPROM contains useable data or not
 	/// @param Source Source EEPROM with pawsible data

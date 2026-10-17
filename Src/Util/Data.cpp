@@ -43,12 +43,12 @@
 
 //╔════════════════════════ Start of GPIO functions ════════════════════════╗
 
-	void SetAsOutput(uint GPIO){
+	void SetAsOutput(unsigned int GPIO){
 		gpio_init(GPIO);
 		gpio_set_dir(GPIO, GPIO_OUT);
 	}
 
-	void SetAsInput(uint GPIO, bool PullDown = false){
+	void SetAsInput(unsigned int GPIO, bool PullDown = false){
 		gpio_init(GPIO);
 		gpio_set_dir(GPIO,GPIO_IN);
 		if (PullDown){

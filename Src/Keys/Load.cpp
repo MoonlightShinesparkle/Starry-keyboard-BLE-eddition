@@ -4,7 +4,7 @@
 
 //╔══════════════════════════════════════════════ Start of Starry parser ═════════════════════════════════════════════╗	
 
-	static void LoadKeys(Mem24C16 Source, BaseKey* Destination[SizeY][SizeX]){
+	void LoadKeys(Mem24C16 Source, BaseKey* Destination[SizeY][SizeX]){
 		// Verify memory containing relevant data
 		if (!VerifyMem(Source)){
 			std::cout << "[LoadKeys] Problem while verifying memory, loading defaults" << std::endl;
@@ -36,8 +36,10 @@
 					// Format is pretty simple: just get the next value, that's the key
 					unsigned char Acquired = Source.GetValue(C);
 
+					SingleKey Insertable = SingleKey(Acquired);
+
 					// Load key data into slot
-					Destination[Y][X] = &SingleKey(Acquired);
+					Destination[Y][X] = &Insertable;
 					std::cout << "[LoadKeys] Loaded single key [" << (int)Acquired << "]" << std::endl; 
 
 					// Increment slot by 1 as it has been loaded
@@ -69,8 +71,10 @@
 
 					std::cout << ']' << std::endl;
 
+					MultiKey Insertable = MultiKey(KeyCache,KeyLength);
+
 					// Load data into destination
-					Destination[Y][X] = &MultiKey(KeyCache,KeyLength);
+					Destination[Y][X] = &Insertable;
 
 					// Move towards next slot
 					X++;
@@ -93,7 +97,9 @@
 					}
 
 					// Turn string into TextKey
-					Destination[Y][X] = &TextKey(Stringified);
+					TextKey Insertable = TextKey(Stringified);
+
+					Destination[Y][X] = &Insertable;
 
 					std::cout << "[LoadKeys] Loaded Textkey [" << Stringified << ']' << std::endl;
 
@@ -113,8 +119,10 @@
 				Y++;
 				X = 0;
 			}
+
+			SingleKey Insertable = SingleKey(DefaultIfOORKey);
 			// Load basic key
-			Destination[Y][X] = &SingleKey(DefaultIfOORKey);
+			Destination[Y][X] = &Insertable;
 			// Go to next slot since C is meaningless at this point
 			X++;
 		}
@@ -147,7 +155,8 @@
 				// Insertable is a default key within the default array or the default OOR key (to account for bigger starry keyboards)
 				unsigned char Insertable = ((Y < DefaultKeysSizeY) & (X < DefaultKeysSizeX)) ? DefaultKeys[Y][X] : DefaultIfOORKey;
 				// Turn into a generic single key and toss into array
-				Destination[Y][X] = &SingleKey(Insertable);
+				SingleKey Referenceable = SingleKey(Insertable);
+				Destination[Y][X] = &Referenceable;
 			}
 		}
 	}

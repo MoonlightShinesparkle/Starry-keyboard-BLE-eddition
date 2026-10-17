@@ -11,8 +11,6 @@ Contains certain useful functions for GPIO manipulation and a compact vector2 cl
 #include <stdio.h>
 #include <string>
 
-#define println(str) printf("%s\n",str)
-
 // SECTION - GPIO definitions
 
 //╔═════════════════════════ Start of GPIO definitions ═════════════════════════╗
@@ -21,14 +19,14 @@ Contains certain useful functions for GPIO manipulation and a compact vector2 cl
 	 * @brief Turns a GPIO into an output pin
 	 * @param GPIO GPIO to set
      */
-    void SetAsOutput(uint GPIO);
+    void SetAsOutput(unsigned int GPIO);
 
     /**
      * @brief Turns a GPIO into an input pin
 	 * @param GPIO GPIO to set
 	 * @param PullDown Use pull down resistor
      */
-    void SetAsInput(uint GPIO, bool PullDown);
+    void SetAsInput(unsigned int GPIO, bool PullDown);
 
     // Multiplier for ADC values, turns ADC into voltage
     #define ADCConversionFactor 3.3f / (1 << 12);
