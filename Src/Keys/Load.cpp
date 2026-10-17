@@ -40,7 +40,7 @@
 
 					// Load key data into slot
 					Destination[Y][X] = &Insertable;
-					std::cout << "[LoadKeys] Loaded single key [" << (int)Acquired << "]" << std::endl; 
+					std::cout << "[LoadKeys] Loaded SingleKey [" << (int)Acquired << "]" << std::endl; 
 
 					// Increment slot by 1 as it has been loaded
 					X++;
@@ -56,7 +56,7 @@
 					// Max size key cache
 					unsigned char KeyCache[6];
 
-					std::cout << "[LoadKeys] Loading multikey [";
+					std::cout << "[LoadKeys] Loading MultiKey [" << (int)KeyLength << "] {";
 
 					// Loop through key length
 					for(unsigned char V = 0; V < KeyLength; V++){
@@ -69,7 +69,7 @@
 						}
 					}
 
-					std::cout << ']' << std::endl;
+					std::cout << '}' << std::endl;
 
 					MultiKey Insertable = MultiKey(KeyCache,KeyLength);
 
@@ -130,6 +130,17 @@
 	}
 
 	static bool VerifyMem(Mem24C16 Source){
+		std::cout << "[LoadKeys] First values from EEPROM: ";
+		for (unsigned char X = 0; X < 20; X++){
+			unsigned char Given = Source.GetValue(X);
+			if (Given > 32){
+				std::cout << Given;
+			} else {
+				std::cout << '[' << (int)Given << ']';
+			}
+		}
+		std::cout << std::endl;
+
 		// Loop through memory and array
 		for (unsigned char X = 0; X < 13; X++){
 			// Acquire values to compare

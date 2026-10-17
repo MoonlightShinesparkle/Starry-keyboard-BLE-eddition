@@ -564,11 +564,6 @@
 
 		LoadKeys(MainMem, TempArr);
 
-		// TODO: remove this thing after testing
-		for(;;){
-			tight_loop_contents();
-		}
-
 		btstack_main(0, nullptr);
 
 		for(;;){
