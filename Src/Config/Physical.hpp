@@ -88,7 +88,7 @@ A file which allows the simple modification of general physical properties
 	//#define KanaGPIO
 
 	// Key underlight toggle
-	#define PMOSCtrl 5
+	// #define PMOSCtrl 5
 
 	// NOTE: Timer shouldn't be commented out, it's only used if PMOSCtrl is enabled
 
