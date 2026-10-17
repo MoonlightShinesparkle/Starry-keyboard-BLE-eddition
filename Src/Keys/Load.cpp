@@ -4,7 +4,7 @@
 
 //╔══════════════════════════════════════════════ Start of Starry parser ═════════════════════════════════════════════╗	
 
-	static void LoadKeys(Mem24C16 Source, BaseKey Destination[SizeY][SizeX]){
+	static void LoadKeys(Mem24C16 Source, BaseKey* Destination[SizeY][SizeX]){
 		// Verify memory containing relevant data
 		if (!VerifyMem(Source)){
 			std::cout << "[LoadKeys] Problem while verifying memory, loading defaults" << std::endl;
@@ -37,7 +37,7 @@
 					unsigned char Acquired = Source.GetValue(C);
 
 					// Load key data into slot
-					Destination[Y][X] = SingleKey(Acquired);
+					Destination[Y][X] = &SingleKey(Acquired);
 					std::cout << "[LoadKeys] Loaded single key [" << (int)Acquired << "]" << std::endl; 
 
 					// Increment slot by 1 as it has been loaded
@@ -70,7 +70,7 @@
 					std::cout << ']' << std::endl;
 
 					// Load data into destination
-					Destination[Y][X] = MultiKey(KeyCache,KeyLength);
+					Destination[Y][X] = &MultiKey(KeyCache,KeyLength);
 
 					// Move towards next slot
 					X++;
@@ -93,7 +93,7 @@
 					}
 
 					// Turn string into TextKey
-					Destination[Y][X] = TextKey(Stringified);
+					Destination[Y][X] = &TextKey(Stringified);
 
 					std::cout << "[LoadKeys] Loaded Textkey [" << Stringified << ']' << std::endl;
 
@@ -114,7 +114,7 @@
 				X = 0;
 			}
 			// Load basic key
-			Destination[Y][X] = SingleKey(DefaultIfOORKey);
+			Destination[Y][X] = &SingleKey(DefaultIfOORKey);
 			// Go to next slot since C is meaningless at this point
 			X++;
 		}
@@ -140,14 +140,14 @@
 		return true;
 	}
 
-	static void LoadDefaults(BaseKey Destination[SizeY][SizeX]){
+	static void LoadDefaults(BaseKey* Destination[SizeY][SizeX]){
 		// Loop through every destination box
 		for (unsigned char Y = 0; Y < SizeY; Y++){
 			for (unsigned char X = 0; X < SizeX; X++){
 				// Insertable is a default key within the default array or the default OOR key (to account for bigger starry keyboards)
 				unsigned char Insertable = ((Y < DefaultKeysSizeY) & (X < DefaultKeysSizeX)) ? DefaultKeys[Y][X] : DefaultIfOORKey;
 				// Turn into a generic single key and toss into array
-				Destination[Y][X] = SingleKey(Insertable);
+				Destination[Y][X] = &SingleKey(Insertable);
 			}
 		}
 	}

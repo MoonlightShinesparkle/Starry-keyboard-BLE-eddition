@@ -5,6 +5,8 @@
 #include "Descriptors/HIDData.hpp"
 #include "Config/Physical.hpp"
 #include "Keys/Keys.hpp"
+#include "Keys/Load.hpp"
+#include "Lib/24C16.hpp"
 
 extern "C"{
 	#include "Descriptors/btstack_config.h"

@@ -521,6 +521,15 @@
 
 		SetupKeys();
 
+		// Main memory chip interface
+		Mem24C16 MainMem = Mem24C16(MemSDAGPIO,MemSCLGPIO,
+			#ifdef UseI2C0
+			i2c0
+			#else
+			i2c1
+			#endif
+		);
+
 		// SECTION GPIO initialization 
 
 			#ifdef NumLockGPIO
@@ -550,6 +559,10 @@
 			#endif
 
 		// !SECTION GPIO initialization
+
+		BaseKey* TempArr[SizeY][SizeX]; 
+
+		LoadKeys(MainMem, TempArr);
 
 		btstack_main(0, nullptr);
 

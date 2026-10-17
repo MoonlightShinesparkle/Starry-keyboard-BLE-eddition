@@ -103,7 +103,7 @@ Contains different functions for managing the keyboard itself in a physical leve
 				// NOTE: Schmitt trigger inverts acquired data, define behaviour in Physical.hpp
 				#ifdef SchmittInvert
 					bool Pressed = gpio_get(x) == 1;
-				#elifndef
+				#else
 					bool Pressed = gpio_get(x) == 0;
 				#endif
 

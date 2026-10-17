@@ -106,8 +106,25 @@ A file which allows the simple modification of general physical properties
 	// Comment/Uncomment to define board hardware characteristics
 
 	// Presence of a schmitt trigger NOT gate chip (such as 74HC14)
-	#define SchmittInvert
+	//#define SchmittInvert
 
 //╚═══════════════════════════════ End of Hardware characteristics ═════════════════════════════╝
+
+// !SECTION Hardware characteristics
+
+// SECTION Memory
+
+//╔═══════════════════════════════════════ Start of Memory ═════════════════════════════════════╗
+
+	// If defined, make use of I2C0, otherwise use I2C1
+	// #define UseI2C0
+
+	// GPIO used for SDA memory interface
+	#define MemSDAGPIO 10
+
+	// GPIO used for SCL memory interface
+	#define MemSCLGPIO 11
+
+//╚════════════════════════════════════════ End of Memory ══════════════════════════════════════╝
 
 // !SECTION Hardware characteristics

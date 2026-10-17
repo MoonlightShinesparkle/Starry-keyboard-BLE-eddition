@@ -54,7 +54,7 @@
 		{0xE8,0x27,0x37,0x2E,0x2D}
 	};
 
-	// Default key if out of range of default layout
+	// Default key if out of range of default layout, used when keys are required but not found elsewhere
 	#define DefaultIfOORKey 0x35
 
 //╚═════════════════════════════════════════════════ End of Mem misc ═════════════════════════════════════════════════╝
@@ -69,7 +69,7 @@
 	/// @param Source Source EEPROM with pawsible data
 	/// @param Destination Destination array where keys will be inserted into
 	/// @note Runs VerifyMem and outputs a default layout where applicable
-	static void LoadKeys(Mem24C16 Source, BaseKey Destination[SizeY][SizeX]);
+	static void LoadKeys(Mem24C16 Source, BaseKey* Destination[SizeY][SizeX]);
 
 	/// @brief Returns wheter an EEPROM contains useable data or not
 	/// @param Source Source EEPROM with pawsible data
@@ -78,7 +78,7 @@
 
 	/// @brief Loads default data into Destination
 	/// @param Destination Destination array where keys will be inserted into
-	static void LoadDefaults(BaseKey Destination[SizeY][SizeX]);
+	static void LoadDefaults(BaseKey* Destination[SizeY][SizeX]);
 
 //╚══════════════════════════════════════════════ End of Starry parser ═══════════════════════════════════════════════╝
 
